@@ -1,0 +1,37 @@
+﻿# .NET build output
+**/bin/
+**/obj/
+
+# Angular build output and dependencies
+**/node_modules/
+**/dist/
+**/.angular/cache/
+
+# Local configuration and secrets
+**/appsettings.json
+**/appsettings.Development.json
+**/appsettings.*.json
+**/.env
+**/.env.*
+!**/.env.example
+**/secrets.json
+
+# Local databases and logs
+*.db
+*.sqlite
+*.sqlite3
+*.log
+
+# IDE and operating system files
+.vs/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local backups — preserve locally; review separately before cloud upload
+/backups/
+**/backups/
+
+# Local source recovery copies
+*.bak
+*.tenant-backup

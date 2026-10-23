@@ -1,0 +1,771 @@
+<div class="app-shell" [class.sidebar-collapsed]="sidebarCollapsed">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">R</div>
+      <div class="brand-text">
+        <strong>RentalSaaS</strong>
+        <span>PROPERTY MANAGEMENT</span>
+      </div>
+    </div>
+
+    <button class="collapse-button" (click)="toggleSidebar()">
+      <span>{{ sidebarCollapsed ? '☰' : '⇤' }}</span>
+      <span class="nav-label">{{ sidebarCollapsed ? 'Expand menu' : 'Collapse menu' }}</span>
+    </button>
+
+    <div class="nav-heading">WORKSPACE</div>
+    <nav class="navigation">
+      <button class="nav-item" [class.active]="selectedView === 'Overview'" (click)="selectView('Overview')" title="Overview">
+        <span class="nav-icon">▦</span><span class="nav-label">Overview</span>
+      </button>
+      <button class="nav-item" [class.active]="selectedView === 'Properties'" (click)="selectView('Properties')" title="Properties">
+        <span class="nav-icon">⌂</span><span class="nav-label">Properties</span>
+      </button>
+      <button class="nav-item"
+              [class.active]="selectedView === 'Property Config'"
+              (click)="selectView('Property Config')"
+              title="Property Config">
+        <span class="nav-icon">⚙</span>
+        <span class="nav-label">Property Config</span>
+      </button>
+      <button class="nav-item" [class.active]="selectedView === 'Rental units'" (click)="selectView('Rental units')" title="Rental units">
+        <span class="nav-icon">▤</span><span class="nav-label">Rental units</span>
+      </button>
+      <button class="nav-item" [class.active]="selectedView === 'Tenants'" (click)="selectView('Tenants')" title="Tenants">
+        <span class="nav-icon">♙</span><span class="nav-label">Tenants</span>
+      </button>
+      <button class="nav-item" [class.active]="selectedView === 'Leases'" (click)="selectView('Leases')" title="Leases">
+        <span class="nav-icon">▧</span><span class="nav-label">Leases</span><span class="soon nav-label">Soon</span>
+      </button>
+      <button class="nav-item" [class.active]="selectedView === 'Payments'" (click)="selectView('Payments')" title="Payments">
+        <span class="nav-icon">K</span><span class="nav-label">Payments</span><span class="soon nav-label">Soon</span>
+      </button>
+    </nav>
+
+    <div class="nav-heading management-heading">MANAGEMENT</div>
+    <nav class="navigation">
+      <button class="nav-item" [class.active]="selectedView === 'Reports'" (click)="selectView('Reports')" title="Reports">
+        <span class="nav-icon">▥</span><span class="nav-label">Reports</span><span class="soon nav-label">Soon</span>
+      </button>
+      <button class="nav-item" [class.active]="selectedView === 'Settings'" (click)="selectView('Settings')" title="Settings">
+        <span class="nav-icon">⚙</span><span class="nav-label">Settings</span><span class="soon nav-label">Soon</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="avatar">RS</div>
+      <div class="profile-text">
+        <strong>Administrator</strong>
+        <span>Property manager</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-area">
+    <header class="topbar">
+      <div class="breadcrumb">Workspace <span>/</span> {{ selectedView }}</div>
+      <div class="topbar-right">
+        <span class="system-indicator"><span class="online-dot"></span> Rental management</span>
+        <div class="top-avatar">RS</div>
+      </div>
+    </header>
+
+    <section class="page-content">
+            <section class="property-config-panel" *ngIf="selectedView === 'Property Config'">
+        <div class="config-page-heading">
+          <div>
+            <div class="eyebrow">PROPERTY MANAGEMENT</div>
+            <h1>Property Config</h1>
+            <p class="subtitle">Customize the details and appearance of each property.</p>
+          </div>
+        </div>
+
+        <div class="config-selector-card">
+          <label for="configPropertySelect">Configure property</label>
+          <select id="configPropertySelect"
+                  [ngModel]="selectedPropertyId"
+                  (ngModelChange)="onConfigPropertyChange($event)">
+            <option [ngValue]="null">Select a property</option>
+            <option *ngFor="let property of properties" [ngValue]="property.id">
+              {{ property.name }} — {{ property.address }}
+            </option>
+          </select>
+        </div>
+
+        <div class="config-empty-state"
+             *ngIf="!loading && properties.length === 0">
+          <h3>No properties available</h3>
+          <p>Add a property in the Properties section before configuring it.</p>
+          <button type="button" class="config-primary-button"
+                  (click)="selectView('Properties')">
+            Go to Properties
+          </button>
+        </div>
+
+        <div class="config-layout" *ngIf="configProperty">
+          <div class="config-main-column">
+            <section class="config-card">
+              <div class="config-card-heading">
+                <span class="config-section-icon">⌂</span>
+                <div>
+                  <h2>Property details</h2>
+                  <p>Update the information displayed for this property.</p>
+                </div>
+              </div>
+
+              <div class="config-fields">
+                <label>Property name
+                  <input name="configPropertyName"
+                         [(ngModel)]="configForm.name"
+                         placeholder="Property name">
+                </label>
+                <label>Address / location
+                  <input name="configPropertyAddress"
+                         [(ngModel)]="configForm.address"
+                         placeholder="Property address">
+                </label>
+                <label>Property owner
+                  <input name="configPropertyOwner"
+                         [(ngModel)]="configForm.ownerName"
+                         placeholder="Owner name">
+                </label>
+              </div>
+            </section>
+
+            <section class="config-card">
+              <div class="config-card-heading">
+                <span class="config-section-icon">♙</span>
+                <div>
+                  <h2>Tenant onboarding</h2>
+                  <p>Register tenants and prepare them for unit assignment.</p>
+                </div>
+              </div>
+              <p class="config-help">
+                Tenant records are managed in the Tenants module. Linking each
+                tenant to this property and assigning a unit will be added in
+                the next backend stage.
+              </p>
+              <button type="button" class="config-secondary-button"
+                      (click)="selectView('Tenants')">
+                Open Tenant Management
+              </button>
+            </section>
+
+            <section class="config-card">
+              <div class="config-card-heading">
+                <span class="config-section-icon">▧</span>
+                <div>
+                  <h2>Property branding</h2>
+                  <p>Select a logo for the property workspace.</p>
+                </div>
+              </div>
+              <label class="config-upload">
+                <span>Choose property logo</span>
+                <input type="file" accept="image/*"
+                       (change)="onPropertyLogoSelected($event)">
+              </label>
+              <p class="config-help">Choose an image under 2 MB. Save Changes stores the logo and branding settings.</p>
+            </section>
+
+            <section class="config-card">
+              <div class="config-card-heading">
+                <span class="config-section-icon">◐</span>
+                <div>
+                  <h2>Dashboard appearance</h2>
+                  <p>Choose colors for this property's workspace preview.</p>
+                </div>
+              </div>
+              <div class="config-color-fields">
+                <label>Primary color
+                  <input type="color" [(ngModel)]="configPrimaryColor"
+                         name="configPrimaryColor">
+                </label>
+                <label>Accent color
+                  <input type="color" [(ngModel)]="configAccentColor"
+                         name="configAccentColor">
+                </label>
+              </div>
+            </section>
+
+            <div class="config-notice" *ngIf="configNotice">
+              {{ configNotice }}
+            </div>
+
+            <div class="config-actions">
+              <button type="button" class="config-secondary-button"
+                      (click)="resetPropertyConfigPreview()">
+                Reset preview
+              </button>
+              <button type="button" class="config-secondary-button"
+                      (click)="previewPropertyConfig()">
+                Preview changes
+              </button>
+              <button type="button" class="config-primary-button"
+                      [disabled]="configSaving"
+                      (click)="savePropertyConfig()">
+                {{ configSaving ? 'Saving...' : 'Save Changes' }}
+              </button>
+            </div>
+          </div>
+
+          <aside class="config-preview-card">
+            <div class="config-preview-label">LIVE PREVIEW</div>
+            <div class="config-preview-brand"
+                 [style.background]="configPrimaryColor">
+              <img *ngIf="logoPreviewUrl" [src]="logoPreviewUrl"
+                   alt="Property logo preview">
+              <span *ngIf="!logoPreviewUrl" class="config-preview-logo">R</span>
+              <div>
+                <strong>{{ configForm.name || 'Property name' }}</strong>
+                <small>{{ configForm.address || 'Property location' }}</small>
+              </div>
+            </div>
+            <div class="config-preview-body"
+                 [style.background]="configAccentColor">
+              <span>PROPERTY WORKSPACE</span>
+              <h3>{{ configForm.name || 'Your property' }}</h3>
+              <p>{{ configForm.address || 'Property address' }}</p>
+              <div class="config-preview-stat">
+                <span>Property owner</span>
+                <strong>{{ configForm.ownerName || 'Owner name' }}</strong>
+              </div>
+              <div class="config-preview-stat">
+                <span>Rental units</span>
+                <strong>{{ configProperty.units.length }}</strong>
+              </div>
+              <div class="config-preview-bar"
+                   [style.background]="configPrimaryColor"></div>
+            </div>
+            <p class="config-help">
+              This is a local preview. Your existing dashboard theme has not
+              been changed.
+            </p>
+          </aside>
+        </div>
+      </section>
+      <section class="tenant-management-panel" *ngIf="selectedView === 'Tenants'">
+        <div class="tenant-page-heading">
+          <div>
+            <div class="eyebrow">PEOPLE MANAGEMENT</div>
+            <h1>Tenant Management</h1>
+            <p class="subtitle">Add tenants, maintain their records and import tenant details from Excel.</p>
+          </div>
+          <button class="tenant-primary-button" (click)="openNewTenantForm()">+ Add tenant</button>
+        </div>
+
+        <div class="tenant-toolbar">
+          <input class="tenant-search" type="search" [(ngModel)]="tenantSearch"
+                 placeholder="Search by name, phone, email or National ID">
+          <button class="tenant-secondary-button" (click)="downloadTenantTemplate()">Download Excel template</button>
+          <label class="tenant-upload-button">
+            Import Excel
+            <input type="file" accept=".xlsx,.xls" (change)="onExcelSelected($event)">
+          </label>
+          <button class="tenant-secondary-button" (click)="loadTenants()" [disabled]="tenantsLoading">↻ Refresh</button>
+        </div>
+
+        <div class="tenant-notice success" *ngIf="tenantMessage">{{ tenantMessage }}</div>
+        <div class="tenant-notice error" *ngIf="tenantError">{{ tenantError }}</div>
+
+        <div class="tenant-form-card" *ngIf="tenantFormVisible">
+          <h2>{{ editingTenantId === null ? 'Add tenant' : 'Edit tenant' }}</h2>
+          <form (ngSubmit)="saveTenant()" #tenantFormRef="ngForm">
+            <div class="tenant-form-grid">
+              <label>
+                Full name *
+                <input name="fullName" [(ngModel)]="tenantForm.fullName" required maxlength="150">
+              </label>
+              <label>
+                Phone number *
+                <input name="phoneNumber" [(ngModel)]="tenantForm.phoneNumber" required maxlength="30">
+              </label>
+              <label>
+                Email
+                <input name="email" type="email" [(ngModel)]="tenantForm.email" maxlength="150">
+              </label>
+              <label>
+                National ID
+                <input name="nationalId" [(ngModel)]="tenantForm.nationalId" maxlength="50">
+              </label>
+            </div>
+            <div class="tenant-form-actions">
+              <button class="tenant-primary-button" type="submit"
+                      [disabled]="tenantSaving || tenantFormRef.invalid">
+                {{ tenantSaving ? 'Saving...' : 'Save tenant' }}
+              </button>
+              <button class="tenant-secondary-button" type="button" (click)="cancelTenantForm()">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="tenant-table-card">
+          <div class="tenant-table-heading">
+            <div>
+              <h2>Tenant records</h2>
+              <p>{{ filteredTenants.length }} record(s)</p>
+            </div>
+          </div>
+
+          <div class="tenant-loading" *ngIf="tenantsLoading">Loading tenants...</div>
+
+          <div class="tenant-table-scroll" *ngIf="!tenantsLoading">
+            <table class="tenant-table">
+              <thead>
+                <tr>
+                  <th>Tenant</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                  <th>National ID</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let tenant of filteredTenants">
+                  <td><strong>{{ tenant.fullName }}</strong></td>
+                  <td>{{ tenant.phoneNumber }}</td>
+                  <td>{{ tenant.email || '—' }}</td>
+                  <td>{{ tenant.nationalId || '—' }}</td>
+                  <td>
+                    <span class="tenant-status" [class.inactive]="!tenant.isActive">
+                      {{ tenant.isActive ? 'Active' : 'Inactive' }}
+                    </span>
+                  </td>
+                  <td class="tenant-actions">
+                    <button class="tenant-text-button" (click)="editTenant(tenant)">Edit</button>
+                    <button class="tenant-text-button danger" *ngIf="tenant.isActive"
+                            (click)="deactivateTenant(tenant)">Deactivate</button>
+                  </td>
+                </tr>
+                <tr *ngIf="filteredTenants.length === 0">
+                  <td colspan="6" class="tenant-empty">
+                    {{ tenantSearch ? 'No tenants match your search.' : 'No tenant records yet. Select Add tenant to create the first record.' }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="tenant-import-hint">
+            Excel columns: FullName, PhoneNumber, Email, NationalId. The first worksheet is imported.
+          </p>
+        </div>
+      </section>
+
+      <ng-container *ngIf="selectedView !== 'Tenants' && selectedView !== 'Property Config'">
+      <div class="welcome-row">
+        <div>
+          <div class="eyebrow">PROPERTY MANAGEMENT</div>
+          <h1>{{ selectedView === 'Overview' ? 'Portfolio overview' : selectedView }}</h1>
+          <p class="subtitle">
+            {{ selectedView === 'Overview'
+              ? 'Monitor your properties, rental units and monthly rental potential.'
+              : 'Manage and review your property portfolio.' }}
+          </p>
+        </div>
+        <button class="refresh-button" (click)="loadProperties()" [disabled]="loading">
+          <span>↻</span> Refresh data
+        </button>
+      </div>
+
+      <div class="error-banner" *ngIf="errorMessage">
+        <span>⚠</span>
+        <div>
+          <strong>Unable to load property data</strong>
+          <p>{{ errorMessage }}</p>
+          <button (click)="loadProperties()">Try again</button>
+        </div>
+      </div>
+
+            <section class="property-dashboard"
+               *ngIf="selectedView === 'Overview'">
+
+        <div class="property-dashboard-heading">
+          <div>
+            <div class="eyebrow">PROPERTY PERFORMANCE</div>
+            <h2>Property-specific dashboard</h2>
+            <p class="subtitle">View occupancy and expected rental income for one property.</p>
+          </div>
+
+          <label class="dashboard-property-select">
+            <span>Select property</span>
+            <select
+              [ngModel]="dashboardPropertyId"
+              (ngModelChange)="onDashboardPropertyChange($event)">
+              <option [ngValue]="null">Select a property</option>
+              <option *ngFor="let property of properties"
+                      [ngValue]="property.id">
+                {{ property.name }}
+              </option>
+            </select>
+          </label>
+        </div>
+
+        <div class="dashboard-empty" *ngIf="!loading && !dashboardProperty">
+          <h3>No property available</h3>
+          <p>Add a property first to view its individual performance.</p>
+          <button type="button"
+                  class="property-add-button"
+                  (click)="selectView('Properties')">
+            Add a property
+          </button>
+        </div>
+
+        <ng-container *ngIf="dashboardProperty as property">
+          <div class="dashboard-property-identity">
+            <div class="dashboard-property-logo"
+                 [style.background]="property.accentColor || '#eaf7ef'"
+                 [style.color]="property.primaryColor || '#245b45'">
+              <img *ngIf="property.logoDataUrl"
+                   [src]="property.logoDataUrl"
+                   [alt]="property.name + ' logo'">
+              <span *ngIf="!property.logoDataUrl">⌂</span>
+            </div>
+            <div>
+              <h3>{{ property.name }}</h3>
+              <p>{{ property.address }} · Owner: {{ property.ownerName }}</p>
+            </div>
+          </div>
+
+          <div class="dashboard-metrics-grid">
+            <article class="dashboard-metric">
+              <span>Total units</span>
+              <strong>{{ dashboardTotalUnits }}</strong>
+              <small>Units registered at this property</small>
+            </article>
+
+            <article class="dashboard-metric">
+              <span>Occupied units</span>
+              <strong>{{ dashboardOccupiedUnits }}</strong>
+              <small>Units marked occupied</small>
+            </article>
+
+            <article class="dashboard-metric">
+              <span>Vacant units</span>
+              <strong>{{ dashboardVacantUnits }}</strong>
+              <small>Units marked vacant</small>
+            </article>
+
+            <article class="dashboard-metric">
+              <span>Occupancy rate</span>
+              <strong>{{ dashboardOccupancyRate }}%</strong>
+              <div class="occupancy-track">
+                <div class="occupancy-fill"
+                     [style.width.%]="dashboardOccupancyRate"></div>
+              </div>
+              <small>Occupied units divided by all units</small>
+            </article>
+          </div>
+
+          <div class="dashboard-income">
+            <div>
+              <span>Expected monthly rent</span>
+              <strong>{{ dashboardExpectedMonthlyRent | currency:'KES ':'symbol':'1.0-0' }}</strong>
+              <small>Based on the monthly rent entered for this property's units; not confirmed collections.</small>
+            </div>
+            <span class="dashboard-income-icon">KSh</span>
+          </div>
+
+          <div class="dashboard-units">
+            <div class="dashboard-units-heading">
+              <div>
+                <h3>Rental unit breakdown</h3>
+                <p>Units belonging to {{ property.name }}.</p>
+              </div>
+              <span>{{ dashboardTotalUnits }} units</span>
+            </div>
+
+            <div class="dashboard-no-units" *ngIf="property.units.length === 0">
+              No rental units have been registered for this property yet.
+            </div>
+
+            <div class="dashboard-table-wrap" *ngIf="property.units.length > 0">
+              <table class="dashboard-unit-table">
+                <thead>
+                  <tr>
+                    <th>Unit</th>
+                    <th>Monthly rent</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let unit of property.units">
+                    <td>{{ unit.unitNumber }}</td>
+                    <td>{{ unit.monthlyRent | currency:'KES ':'symbol':'1.0-0' }}</td>
+                    <td>
+                      <span class="dashboard-status"
+                            [class.status-occupied]="unit.status.toLowerCase() === 'occupied'"
+                            [class.status-vacant]="unit.status.toLowerCase() === 'vacant'">
+                        {{ unit.status }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </ng-container>
+      </section>
+<div class="metrics-grid">
+        <article class="metric-card">
+          <div class="metric-top">
+            <span class="metric-label">Total properties</span>
+            <span class="metric-icon blue">⌂</span>
+          </div>
+          <div class="metric-value">{{ loading ? '—' : properties.length }}</div>
+          <div class="metric-foot">Properties in your portfolio</div>
+        </article>
+
+        <article class="metric-card">
+          <div class="metric-top">
+            <span class="metric-label">Total rental units</span>
+            <span class="metric-icon purple">▤</span>
+          </div>
+          <div class="metric-value">{{ loading ? '—' : totalUnits }}</div>
+          <div class="metric-foot">Units across all properties</div>
+        </article>
+
+        <article class="metric-card">
+          <div class="metric-top">
+            <span class="metric-label">Occupied units</span>
+            <span class="metric-icon green">✓</span>
+          </div>
+          <div class="metric-value">{{ loading ? '—' : occupiedUnits }}</div>
+          <div class="metric-foot">Currently marked occupied</div>
+        </article>
+
+        <article class="metric-card">
+          <div class="metric-top">
+            <span class="metric-label">Vacant units</span>
+            <span class="metric-icon amber">⌂</span>
+          </div>
+          <div class="metric-value">{{ loading ? '—' : vacantUnits }}</div>
+          <div class="metric-foot">Available or awaiting tenants</div>
+        </article>
+      </div>
+
+      <section class="rent-summary">
+        <div class="rent-icon">KSh</div>
+        <div class="rent-copy">
+          <span>Potential monthly rent</span>
+          <strong>{{ loading ? 'Loading…' : (potentialMonthlyRent | currency:'KES ':'symbol':'1.0-0') }}</strong>
+          <small>Combined monthly rent for all listed units</small>
+        </div>
+        <div class="rent-decoration">↗</div>
+      </section>
+
+            <section class="property-create-area">
+        <div class="property-create-heading">
+          <div>
+            <h2>Manage properties</h2>
+            <p>Register a property and its rental units.</p>
+          </div>
+          <button type="button"
+                  class="property-add-button"
+                  *ngIf="!propertyFormVisible"
+                  (click)="openNewPropertyForm()">
+            + Add Property
+          </button>
+        </div>
+
+        <div class="property-feedback property-success"
+             *ngIf="propertyMessage">
+          {{ propertyMessage }}
+        </div>
+
+        <form class="property-form"
+              *ngIf="propertyFormVisible"
+              (ngSubmit)="saveProperty()">
+          <h3>New Property</h3>
+          <p>Enter the property details and rental units.</p>
+
+          <div class="property-form-grid">
+            <label>
+              Property name *
+              <input name="propertyName"
+                     [(ngModel)]="propertyForm.name"
+                     placeholder="e.g. Christine Residence"
+                     required />
+            </label>
+
+            <label>
+              Property address / location *
+              <input name="propertyAddress"
+                     [(ngModel)]="propertyForm.address"
+                     placeholder="e.g. Embu, Kenya"
+                     required />
+            </label>
+
+            <label>
+              Property owner *
+              <input name="propertyOwner"
+                     [(ngModel)]="propertyForm.ownerName"
+                     placeholder="Owner's name"
+                     required />
+            </label>
+          </div>
+
+          <div class="property-unit-form-heading">
+            <h4>Rental units</h4>
+            <button type="button"
+                    class="property-secondary-button"
+                    (click)="addPropertyUnit()">
+              + Add unit
+            </button>
+          </div>
+
+          <div class="property-unit-form-row"
+               *ngFor="let unit of propertyForm.units; let i = index">
+            <label>
+              Unit number *
+              <input [name]="'unitNumber' + i"
+                     [(ngModel)]="unit.unitNumber"
+                     placeholder="e.g. A1"
+                     required />
+            </label>
+
+            <label>
+              Monthly rent (KES) *
+              <input type="number"
+                     [name]="'monthlyRent' + i"
+                     [(ngModel)]="unit.monthlyRent"
+                     min="1"
+                     required />
+            </label>
+
+            <label>
+              Status
+              <select [name]="'unitStatus' + i"
+                      [(ngModel)]="unit.status">
+                <option value="Vacant">Vacant</option>
+                <option value="Occupied">Occupied</option>
+              </select>
+            </label>
+
+            <button type="button"
+                    class="property-remove-button"
+                    *ngIf="propertyForm.units.length > 1"
+                    (click)="removePropertyUnit(i)">
+              Remove
+            </button>
+          </div>
+
+          <div class="property-feedback property-error"
+               *ngIf="propertyError">
+            {{ propertyError }}
+          </div>
+
+          <div class="property-form-actions">
+            <button type="button"
+                    class="property-secondary-button"
+                    [disabled]="propertySaving"
+                    (click)="cancelPropertyForm()">
+              Cancel
+            </button>
+
+            <button type="submit"
+                    class="property-add-button"
+                    [disabled]="propertySaving">
+              {{ propertySaving ? 'Saving...' : 'Save Property' }}
+            </button>
+          </div>
+        </form>
+      </section>
+      <section class="portfolio-section">
+        <div class="section-header">
+          <div>
+            <h2>Property portfolio</h2>
+            <p>Properties and their rental units</p>
+          </div>
+          <div class="portfolio-actions">
+            <label class="search-box">
+              <span>⌕</span>
+              <input type="search" [(ngModel)]="searchTerm" placeholder="Search properties..." />
+            </label>
+            <span class="count-pill">{{ filteredProperties.length }} properties</span>
+          </div>
+        </div>
+
+        <div class="loading-panel" *ngIf="loading">
+          <div class="spinner"></div>
+          <p>Loading your property portfolio...</p>
+        </div>
+
+        <div class="empty-state" *ngIf="!loading && !errorMessage && filteredProperties.length === 0">
+          <div class="empty-icon">⌂</div>
+          <h3>{{ searchTerm ? 'No matching properties' : 'No properties yet' }}</h3>
+          <p>{{ searchTerm ? 'Try another search term.' : 'Your properties will appear here when they are added.' }}</p>
+        </div>
+
+        <div class="property-grid" *ngIf="!loading && filteredProperties.length > 0">
+          <article class="property-card" *ngFor="let property of filteredProperties">
+            <div class="property-card-header">
+              <div class="property-symbol">⌂</div>
+              <div class="property-heading">
+                <h3>{{ property.name }}</h3>
+                <p>{{ property.address }}</p>
+              </div>
+              <span class="property-menu">•••</span>
+            </div>
+
+            <div class="property-meta">
+              <div>
+                <span>PROPERTY OWNER</span>
+                <strong>{{ property.ownerName }}</strong>
+              </div>
+              <div class="property-units-count">
+                <span>RENTAL UNITS</span>
+                <strong>{{ property.units.length }}</strong>
+              </div>
+            </div>
+
+            <div class="property-rent-row">
+              <div>
+                <span>Monthly rental potential</span>
+                <strong>{{ property.units | sumRent | currency:'KES ':'symbol':'1.0-0' }}</strong>
+              </div>
+              <span class="rent-tag">Monthly</span>
+            </div>
+
+            <div class="units-heading">
+              <h4>Unit breakdown</h4>
+              <span>{{ property.units.length }} units</span>
+            </div>
+
+            <div class="units-table-wrap" *ngIf="property.units.length > 0">
+              <table class="units-table">
+                <thead>
+                  <tr>
+                    <th>UNIT</th>
+                    <th>MONTHLY RENT</th>
+                    <th>STATUS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let unit of property.units">
+                    <td class="unit-name">{{ unit.unitNumber }}</td>
+                    <td>{{ unit.monthlyRent | currency:'KES ':'symbol':'1.0-0' }}</td>
+                    <td>
+                      <span class="status-pill"
+                        [class.occupied]="unit.status.toLowerCase() === 'occupied'"
+                        [class.vacant]="unit.status.toLowerCase() === 'vacant'">
+                        <span class="status-dot"></span>{{ unit.status }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="no-units" *ngIf="property.units.length === 0">No rental units have been added.</div>
+          </article>
+        </div>
+      </section>
+
+      <footer class="page-footer">
+        <span>RentalSaaS <span class="footer-dot">•</span> Property management workspace</span>
+        <span>Portfolio overview</span>
+      </footer>
+      </ng-container>
+    </section>
+  </main>
+</div>
+
