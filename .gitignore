@@ -1,0 +1,21 @@
+﻿# .NET build output
+**/bin/
+**/obj/
+
+# Angular dependencies and generated output
+**/node_modules/
+**/dist/
+**/.angular/
+
+# Local configuration and secrets
+**/appsettings.Development.json
+**/appsettings.*.local.json
+.env
+.env.*
+
+# Temporary backups
+*.bak
+
+# Logs and local IDE files
+*.log
+.vs/
