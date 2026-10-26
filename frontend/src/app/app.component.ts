@@ -60,8 +60,8 @@ export class SumRentPipe implements PipeTransform {
 export class AppComponent implements OnInit {
   title = 'RentalSaaS';
 
-  private readonly apiUrl = 'http://localhost:5053/api/Properties';
-  private readonly tenantApi = 'http://localhost:5053/api/Tenants';
+  private readonly apiUrl = 'http://localhost:5081/api/Properties';
+  private readonly tenantApi = 'http://localhost:5081/api/Tenants';
 
   properties: Property[] = [];
   propertyFormVisible = false;
@@ -683,4 +683,5 @@ export class AppComponent implements OnInit {
     };
   }
 }
+
 
