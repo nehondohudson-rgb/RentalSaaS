@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,7 +16,7 @@ namespace RentalSaaS.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[AllowAnonymous]
+
 public class AuthController : ControllerBase
 {
     private readonly ApplicationDbContext _db;
@@ -31,6 +31,7 @@ public class AuthController : ControllerBase
         _configuration = configuration;
     }
 
+    [AllowAnonymous]
     [HttpPost("bootstrap-admin")]
     public async Task<IActionResult> BootstrapAdmin(
         [FromBody] BootstrapAdminRequest request)
@@ -94,6 +95,7 @@ public class AuthController : ControllerBase
         return Ok(CreateAuthResponse(user));
     }
 
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login(
         [FromBody] LoginRequest request)
@@ -144,6 +146,55 @@ public class AuthController : ControllerBase
         return Ok(CreateAuthResponse(user));
     }
 
+    [Authorize(Roles = "SuperAdmin")]
+    [HttpPost("create-manager")]
+    public async Task<IActionResult> CreateManager(
+        [FromBody] CreateManagerRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email) ||
+            !System.Net.Mail.MailAddress.TryCreate(request.Email, out _))
+        {
+            return BadRequest(new { message = "Enter a valid email address." });
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Password) ||
+            request.Password.Length < 12)
+        {
+            return BadRequest(new
+            {
+                message = "Password must contain at least 12 characters."
+            });
+        }
+
+        var email = request.Email.Trim().ToLowerInvariant();
+
+        if (await _db.ApplicationUsers.AnyAsync(u => u.Email == email))
+        {
+            return Conflict(new { message = "That email already exists." });
+        }
+
+        var user = new ApplicationUser
+        {
+            Email = email,
+            Role = "PropertyManager",
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        user.PasswordHash =
+            _passwordHasher.HashPassword(user, request.Password);
+
+        _db.ApplicationUsers.Add(user);
+        await _db.SaveChangesAsync();
+
+        return Ok(new
+        {
+            userId = user.Id,
+            email = user.Email,
+            role = user.Role,
+            message = "Manager account created successfully."
+        });
+    }
     private object CreateAuthResponse(ApplicationUser user)
     {
         var key = new SymmetricSecurityKey(
@@ -198,3 +249,9 @@ public class LoginRequest
     public string Password { get; set; } = string.Empty;
 }
 
+
+public class CreateManagerRequest
+{
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+}
