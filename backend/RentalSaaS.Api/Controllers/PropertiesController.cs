@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RentalSaaS.Api.Data;
 using RentalSaaS.Api.Models;
@@ -7,6 +8,7 @@ namespace RentalSaaS.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class PropertiesController : ControllerBase
 {
     private readonly ApplicationDbContext _context;

@@ -19,3 +19,6 @@
 # Logs and local IDE files
 *.log
 .vs/
+
+# Local publish output
+/artifacts/

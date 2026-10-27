@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RentalSaaS.Api.Data;
@@ -7,6 +8,7 @@ namespace RentalSaaS.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class TenantsController : ControllerBase
 {
     private readonly ApplicationDbContext _context;

@@ -1,8 +1,10 @@
-﻿import { Component, OnInit, Pipe, PipeTransform } from '@angular/core';
+import { API_BASE_URL } from './api.config';
+import { Component, OnInit, Pipe, PipeTransform } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterOutlet } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from './auth.service';
 import { firstValueFrom } from 'rxjs';
 import * as XLSX from 'xlsx';
 
@@ -60,8 +62,14 @@ export class SumRentPipe implements PipeTransform {
 export class AppComponent implements OnInit {
   title = 'RentalSaaS';
 
-  private readonly apiUrl = 'http://localhost:5081/api/Properties';
-  private readonly tenantApi = 'http://localhost:5081/api/Tenants';
+  isAuthenticated = false;
+  loginEmail = '';
+  loginPassword = '';
+  loginError = '';
+  loginLoading = false;
+
+  private readonly apiUrl = `${API_BASE_URL}/Properties`;
+  private readonly tenantApi = `${API_BASE_URL}/Tenants`;
 
   properties: Property[] = [];
   propertyFormVisible = false;
@@ -104,10 +112,46 @@ export class AppComponent implements OnInit {
   editingTenantId: number | null = null;
   tenantForm: TenantForm = this.emptyTenantForm();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   ngOnInit(): void {
-    this.loadProperties();
+    this.isAuthenticated = this.authService.isAuthenticated();
+    if (this.isAuthenticated) {
+      this.loadProperties();
+    } else {
+      this.loading = false;
+    }
+  }
+
+  login(): void {
+    if (this.loginLoading) return;
+
+    this.loginError = '';
+    this.loginLoading = true;
+
+    this.authService.login(this.loginEmail, this.loginPassword).subscribe({
+      next: () => {
+        this.isAuthenticated = true;
+        this.loginPassword = '';
+        this.loginLoading = false;
+        this.loadProperties();
+      },
+      error: (error) => {
+        this.loginError = error?.error?.message
+          || 'Sign-in failed. Check your connection and credentials.';
+        this.loginLoading = false;
+      }
+    });
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.isAuthenticated = false;
+    this.loginEmail = '';
+    this.loginPassword = '';
+    this.properties = [];
+    this.tenants = [];
+    this.loginError = '';
   }
 
   loadProperties(): void {
@@ -683,5 +727,3 @@ export class AppComponent implements OnInit {
     };
   }
 }
-
-

@@ -73,7 +73,6 @@
 }
 
 .collapse-button:hover { background: #203650; color: #fff; }
-.collapse-button > span:first-child { width: 18px; text-align: center; font-size: 17px; }
 
 .nav-heading {
   padding: 0 12px;
@@ -107,7 +106,6 @@
 
 .nav-item:hover { background: #203650; color: #fff; }
 .nav-item.active { background: #315fe9; color: #fff; box-shadow: 0 5px 14px #0b173b40; }
-.nav-icon { display: inline-flex; flex: 0 0 20px; justify-content: center; font-size: 19px; font-weight: 600; }
 .nav-label { overflow: hidden; text-overflow: ellipsis; }
 .soon { margin-left: auto; color: #90a4bd; font-size: 10px; }
 
@@ -204,11 +202,6 @@ h1 { margin: 0; color: #19283d; font-size: clamp(24px, 2.2vw, 30px); font-weight
 
 .metric-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .metric-label { color: #77859a; font-size: 12px; font-weight: 550; }
-.metric-icon { display: grid; width: 38px; height: 38px; flex: 0 0 38px; place-items: center; border-radius: 10px; font-size: 20px; }
-.metric-icon.blue { background: #eaf0ff; color: #4169ed; }
-.metric-icon.purple { background: #f0eaff; color: #8656d8; }
-.metric-icon.green { background: #e3f8ef; color: #149764; }
-.metric-icon.amber { background: #fff3dc; color: #d28b15; }
 .metric-value { margin-top: 13px; color: #17263b; font-size: 30px; font-weight: 750; letter-spacing: -1px; }
 .metric-foot { margin-top: 7px; color: #9aa5b5; font-size: 11px; }
 
@@ -538,3 +531,158 @@ h1 { margin: 0; color: #19283d; font-size: clamp(24px, 2.2vw, 30px); font-weight
 }
 
 
+
+/* Authentication screen */
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: linear-gradient(135deg, #f3f7f4, #e7f0ea);
+  box-sizing: border-box;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 36px;
+  background: #fff;
+  border: 1px solid #e0e9e2;
+  border-radius: 18px;
+  box-shadow: 0 20px 60px rgba(30, 65, 44, 0.10);
+  box-sizing: border-box;
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 34px;
+}
+
+.login-brand-icon {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #245b45;
+  color: white;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.login-brand h1 {
+  margin: 0;
+  color: #193e2d;
+  font-size: 21px;
+}
+
+.login-brand p {
+  margin: 4px 0 0;
+  color: #718077;
+  font-size: 10px;
+  letter-spacing: 1.2px;
+}
+
+.login-card h2 {
+  margin: 0 0 8px;
+  color: #20372a;
+  font-size: 26px;
+}
+
+.login-subtitle {
+  margin: 0 0 26px;
+  color: #718077;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.login-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.login-card label {
+  margin-top: 8px;
+  color: #33473a;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.login-card input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #d5e0d8;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font: inherit;
+}
+
+.login-card input:focus {
+  outline: 2px solid #a7cbb3;
+  border-color: #245b45;
+}
+
+.login-submit {
+  min-height: 46px;
+  margin-top: 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #245b45;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.login-error {
+  margin: 4px 0;
+  color: #b42318;
+  font-size: 13px;
+}
+
+.login-footnote {
+  margin: 24px 0 0;
+  color: #718077;
+  font-size: 12px;
+  text-align: center;
+}
+
+.logout-button {
+  padding: 8px 12px;
+  border: 1px solid #d5e0d8;
+  border-radius: 7px;
+  background: #fff;
+  color: #245b45;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 26px 22px;
+  }
+}
+
+.hamburger-icon {
+  display: flex;
+  width: 20px;
+  height: 16px;
+  flex: 0 0 20px;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.hamburger-icon span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+}

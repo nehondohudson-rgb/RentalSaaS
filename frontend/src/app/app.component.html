@@ -1,4 +1,53 @@
-<div class="app-shell" [class.sidebar-collapsed]="sidebarCollapsed">
+<section class="login-page" *ngIf="!isAuthenticated">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="login-brand-icon">R</div>
+      <div>
+        <h1>RentalSaaS</h1>
+        <p>PROPERTY MANAGEMENT</p>
+      </div>
+    </div>
+
+    <h2>Welcome back</h2>
+    <p class="login-subtitle">Sign in to manage your properties and tenants.</p>
+
+    <form (ngSubmit)="login()" #loginForm="ngForm">
+      <label for="loginEmail">Email address</label>
+      <input
+        id="loginEmail"
+        type="email"
+        name="loginEmail"
+        [(ngModel)]="loginEmail"
+        autocomplete="username"
+        placeholder="you@example.com"
+        required
+        email>
+
+      <label for="loginPassword">Password</label>
+      <input
+        id="loginPassword"
+        type="password"
+        name="loginPassword"
+        [(ngModel)]="loginPassword"
+        autocomplete="current-password"
+        placeholder="Enter your password"
+        required>
+
+      <p class="login-error" *ngIf="loginError">{{ loginError }}</p>
+
+      <button
+        class="login-submit"
+        type="submit"
+        [disabled]="loginForm.invalid || loginLoading">
+        {{ loginLoading ? 'Signing in...' : 'Sign in' }}
+      </button>
+    </form>
+
+    <p class="login-footnote">Secure access to your rental management workspace.</p>
+  </div>
+</section>
+
+<div class="app-shell" *ngIf="isAuthenticated" [class.sidebar-collapsed]="sidebarCollapsed">
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-icon">R</div>
@@ -9,46 +58,46 @@
     </div>
 
     <button class="collapse-button" (click)="toggleSidebar()">
-      <span>{{ sidebarCollapsed ? '☰' : '⇤' }}</span>
+      <span class="hamburger-icon" aria-hidden="true"><span></span><span></span><span></span></span>
       <span class="nav-label">{{ sidebarCollapsed ? 'Expand menu' : 'Collapse menu' }}</span>
     </button>
 
     <div class="nav-heading">WORKSPACE</div>
     <nav class="navigation">
       <button class="nav-item" [class.active]="selectedView === 'Overview'" (click)="selectView('Overview')" title="Overview">
-        <span class="nav-icon">▦</span><span class="nav-label">Overview</span>
+        <span class="nav-label">Overview</span>
       </button>
       <button class="nav-item" [class.active]="selectedView === 'Properties'" (click)="selectView('Properties')" title="Properties">
-        <span class="nav-icon">⌂</span><span class="nav-label">Properties</span>
+        <span class="nav-label">Properties</span>
       </button>
       <button class="nav-item"
               [class.active]="selectedView === 'Property Config'"
               (click)="selectView('Property Config')"
               title="Property Config">
-        <span class="nav-icon">⚙</span>
+
         <span class="nav-label">Property Config</span>
       </button>
       <button class="nav-item" [class.active]="selectedView === 'Rental units'" (click)="selectView('Rental units')" title="Rental units">
-        <span class="nav-icon">▤</span><span class="nav-label">Rental units</span>
+        <span class="nav-label">Rental units</span>
       </button>
       <button class="nav-item" [class.active]="selectedView === 'Tenants'" (click)="selectView('Tenants')" title="Tenants">
-        <span class="nav-icon">♙</span><span class="nav-label">Tenants</span>
+        <span class="nav-label">Tenants</span>
       </button>
       <button class="nav-item" [class.active]="selectedView === 'Leases'" (click)="selectView('Leases')" title="Leases">
-        <span class="nav-icon">▧</span><span class="nav-label">Leases</span><span class="soon nav-label">Soon</span>
+        <span class="nav-label">Leases</span><span class="soon nav-label">Soon</span>
       </button>
       <button class="nav-item" [class.active]="selectedView === 'Payments'" (click)="selectView('Payments')" title="Payments">
-        <span class="nav-icon">K</span><span class="nav-label">Payments</span><span class="soon nav-label">Soon</span>
+        <span class="nav-label">Payments</span><span class="soon nav-label">Soon</span>
       </button>
     </nav>
 
     <div class="nav-heading management-heading">MANAGEMENT</div>
     <nav class="navigation">
       <button class="nav-item" [class.active]="selectedView === 'Reports'" (click)="selectView('Reports')" title="Reports">
-        <span class="nav-icon">▥</span><span class="nav-label">Reports</span><span class="soon nav-label">Soon</span>
+        <span class="nav-label">Reports</span><span class="soon nav-label">Soon</span>
       </button>
       <button class="nav-item" [class.active]="selectedView === 'Settings'" (click)="selectView('Settings')" title="Settings">
-        <span class="nav-icon">⚙</span><span class="nav-label">Settings</span><span class="soon nav-label">Soon</span>
+        <span class="nav-label">Settings</span><span class="soon nav-label">Soon</span>
       </button>
     </nav>
 
@@ -65,6 +114,7 @@
     <header class="topbar">
       <div class="breadcrumb">Workspace <span>/</span> {{ selectedView }}</div>
       <div class="topbar-right">
+        <button type="button" class="logout-button" (click)="logout()">Sign out</button>
         <span class="system-indicator"><span class="online-dot"></span> Rental management</span>
         <div class="top-avatar">RS</div>
       </div>
@@ -87,7 +137,7 @@
                   (ngModelChange)="onConfigPropertyChange($event)">
             <option [ngValue]="null">Select a property</option>
             <option *ngFor="let property of properties" [ngValue]="property.id">
-              {{ property.name }} — {{ property.address }}
+              {{ property.name }} - {{ property.address }}
             </option>
           </select>
         </div>
@@ -106,7 +156,7 @@
           <div class="config-main-column">
             <section class="config-card">
               <div class="config-card-heading">
-                <span class="config-section-icon">⌂</span>
+                <span class="config-section-icon">PR</span>
                 <div>
                   <h2>Property details</h2>
                   <p>Update the information displayed for this property.</p>
@@ -134,7 +184,7 @@
 
             <section class="config-card">
               <div class="config-card-heading">
-                <span class="config-section-icon">♙</span>
+                <span class="config-section-icon">TN</span>
                 <div>
                   <h2>Tenant onboarding</h2>
                   <p>Register tenants and prepare them for unit assignment.</p>
@@ -153,7 +203,7 @@
 
             <section class="config-card">
               <div class="config-card-heading">
-                <span class="config-section-icon">▧</span>
+                <span class="config-section-icon">LE</span>
                 <div>
                   <h2>Property branding</h2>
                   <p>Select a logo for the property workspace.</p>
@@ -169,7 +219,7 @@
 
             <section class="config-card">
               <div class="config-card-heading">
-                <span class="config-section-icon">◐</span>
+                <span class="config-section-icon">BR</span>
                 <div>
                   <h2>Dashboard appearance</h2>
                   <p>Choose colors for this property's workspace preview.</p>
@@ -261,7 +311,7 @@
             Import Excel
             <input type="file" accept=".xlsx,.xls" (change)="onExcelSelected($event)">
           </label>
-          <button class="tenant-secondary-button" (click)="loadTenants()" [disabled]="tenantsLoading">↻ Refresh</button>
+          <button class="tenant-secondary-button" (click)="loadTenants()" [disabled]="tenantsLoading">R Refresh</button>
         </div>
 
         <div class="tenant-notice success" *ngIf="tenantMessage">{{ tenantMessage }}</div>
@@ -324,8 +374,8 @@
                 <tr *ngFor="let tenant of filteredTenants">
                   <td><strong>{{ tenant.fullName }}</strong></td>
                   <td>{{ tenant.phoneNumber }}</td>
-                  <td>{{ tenant.email || '—' }}</td>
-                  <td>{{ tenant.nationalId || '—' }}</td>
+                  <td>{{ tenant.email || '-' }}</td>
+                  <td>{{ tenant.nationalId || '-' }}</td>
                   <td>
                     <span class="tenant-status" [class.inactive]="!tenant.isActive">
                       {{ tenant.isActive ? 'Active' : 'Inactive' }}
@@ -363,12 +413,12 @@
           </p>
         </div>
         <button class="refresh-button" (click)="loadProperties()" [disabled]="loading">
-          <span>↻</span> Refresh data
+          <span>R</span> Refresh data
         </button>
       </div>
 
       <div class="error-banner" *ngIf="errorMessage">
-        <span>⚠</span>
+        <span>!</span>
         <div>
           <strong>Unable to load property data</strong>
           <p>{{ errorMessage }}</p>
@@ -418,11 +468,11 @@
               <img *ngIf="property.logoDataUrl"
                    [src]="property.logoDataUrl"
                    [alt]="property.name + ' logo'">
-              <span *ngIf="!property.logoDataUrl">⌂</span>
+              <span *ngIf="!property.logoDataUrl">PR</span>
             </div>
             <div>
               <h3>{{ property.name }}</h3>
-              <p>{{ property.address }} · Owner: {{ property.ownerName }}</p>
+              <p>{{ property.address }} | Owner: {{ property.ownerName }}</p>
             </div>
           </div>
 
@@ -509,36 +559,36 @@
         <article class="metric-card">
           <div class="metric-top">
             <span class="metric-label">Total properties</span>
-            <span class="metric-icon blue">⌂</span>
+
           </div>
-          <div class="metric-value">{{ loading ? '—' : properties.length }}</div>
+          <div class="metric-value">{{ loading ? '-' : properties.length }}</div>
           <div class="metric-foot">Properties in your portfolio</div>
         </article>
 
         <article class="metric-card">
           <div class="metric-top">
             <span class="metric-label">Total rental units</span>
-            <span class="metric-icon purple">▤</span>
+
           </div>
-          <div class="metric-value">{{ loading ? '—' : totalUnits }}</div>
+          <div class="metric-value">{{ loading ? '-' : totalUnits }}</div>
           <div class="metric-foot">Units across all properties</div>
         </article>
 
         <article class="metric-card">
           <div class="metric-top">
             <span class="metric-label">Occupied units</span>
-            <span class="metric-icon green">✓</span>
+
           </div>
-          <div class="metric-value">{{ loading ? '—' : occupiedUnits }}</div>
+          <div class="metric-value">{{ loading ? '-' : occupiedUnits }}</div>
           <div class="metric-foot">Currently marked occupied</div>
         </article>
 
         <article class="metric-card">
           <div class="metric-top">
             <span class="metric-label">Vacant units</span>
-            <span class="metric-icon amber">⌂</span>
+
           </div>
-          <div class="metric-value">{{ loading ? '—' : vacantUnits }}</div>
+          <div class="metric-value">{{ loading ? '-' : vacantUnits }}</div>
           <div class="metric-foot">Available or awaiting tenants</div>
         </article>
       </div>
@@ -547,10 +597,10 @@
         <div class="rent-icon">KSh</div>
         <div class="rent-copy">
           <span>Potential monthly rent</span>
-          <strong>{{ loading ? 'Loading…' : (potentialMonthlyRent | currency:'KES ':'symbol':'1.0-0') }}</strong>
+          <strong>{{ loading ? 'Loading...' : (potentialMonthlyRent | currency:'KES ':'symbol':'1.0-0') }}</strong>
           <small>Combined monthly rent for all listed units</small>
         </div>
-        <div class="rent-decoration">↗</div>
+        <div class="rent-decoration">-</div>
       </section>
 
             <section class="property-create-area">
@@ -678,7 +728,7 @@
           </div>
           <div class="portfolio-actions">
             <label class="search-box">
-              <span>⌕</span>
+              <span>*</span>
               <input type="search" [(ngModel)]="searchTerm" placeholder="Search properties..." />
             </label>
             <span class="count-pill">{{ filteredProperties.length }} properties</span>
@@ -691,7 +741,7 @@
         </div>
 
         <div class="empty-state" *ngIf="!loading && !errorMessage && filteredProperties.length === 0">
-          <div class="empty-icon">⌂</div>
+          <div class="empty-icon">PR</div>
           <h3>{{ searchTerm ? 'No matching properties' : 'No properties yet' }}</h3>
           <p>{{ searchTerm ? 'Try another search term.' : 'Your properties will appear here when they are added.' }}</p>
         </div>
@@ -704,7 +754,7 @@
                 <h3>{{ property.name }}</h3>
                 <p>{{ property.address }}</p>
               </div>
-              <span class="property-menu">•••</span>
+              <span class="property-menu">***</span>
             </div>
 
             <div class="property-meta">
@@ -761,11 +811,10 @@
       </section>
 
       <footer class="page-footer">
-        <span>RentalSaaS <span class="footer-dot">•</span> Property management workspace</span>
+        <span>RentalSaaS <span class="footer-dot">*</span> Property management workspace</span>
         <span>Portfolio overview</span>
       </footer>
       </ng-container>
     </section>
   </main>
 </div>
-

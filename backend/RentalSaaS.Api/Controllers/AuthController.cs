@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
@@ -15,6 +16,7 @@ namespace RentalSaaS.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[AllowAnonymous]
 public class AuthController : ControllerBase
 {
     private readonly ApplicationDbContext _db;
